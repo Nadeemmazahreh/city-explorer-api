@@ -1,21 +1,29 @@
 const axios = require('axios');
+let myMemory = []
+
 function movieHandl(req, res) {
     let movie = req.query.moviename;
-    console.log(movie);
     let key = process.env.MOVIEKEY;
-    
-    let movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${movie}`;
+
+    if(myMemory[movie] !== undefined){
+    console.log('get the data from Memory');
+    res.send(myMemory[movie]);
+    }
+    else{
+        let movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${movie}`;
         axios.get(movieUrl)
             .then(result => { const movieArr = result.data.results.map(movieItem => {
                     objMovie =  new Movie(movieItem);
-                    console.log(objMovie);
                     return objMovie
                 })
+                myMemory[movie] = movieArr;
+                console.log('get the data from API');
                 res.send(movieArr);
             })
             .catch(err => {
                 res.status(404).send(`Movie Not found ${err}`);
             })
+        }
     }
       
 
